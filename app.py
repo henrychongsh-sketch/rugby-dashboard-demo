@@ -494,13 +494,16 @@ def load_sc_data(file_path):
     df = pd.read_csv(file_path)
     df.columns = df.columns.str.strip()
 
-    df["Test Name"] = df["Test Name"].replace("Bench Press (Swiss Bar)", "Bench Press")
+    # 1. Rename 'Exercise' to 'Test Name' FIRST
+    if "Exercise" in df.columns:
+        df = df.rename(columns={"Exercise": "Test Name"})
+
+    # 2. Safely perform replacements ONLY if 'Test Name' exists
+    if "Test Name" in df.columns:
+        df["Test Name"] = df["Test Name"].replace("Bench Press (Swiss Bar)", "Bench Press")
 
     if "Date" in df.columns:
         df["Date"] = pd.to_datetime(df["Date"], format="%m/%d/%y", errors="coerce")
-
-    if "Exercise" in df.columns:
-        df = df.rename(columns={"Exercise": "Test Name"})
 
     numeric_cols = ["Body Weight (kg)", "Load (kg)", "Reps"]
     for col in numeric_cols:
@@ -524,8 +527,9 @@ def load_sc_data(file_path):
 
     df["1RM Predicted"] = df.apply(calculate_brzycki, axis=1)
     
-    # Calculate Relative Strength
-    df["Relative Strength"] = (df["1RM Predicted"] / df["Body Weight (kg)"].replace(0, 1)).round(2)
+    # Calculate Relative Strength safely
+    if "Body Weight (kg)" in df.columns:
+        df["Relative Strength"] = (df["1RM Predicted"] / df["Body Weight (kg)"].replace(0, 1)).round(2)
 
     return df
 
@@ -611,8 +615,19 @@ if 'selected_metrics' not in st.session_state:
     active_metrics = [m for m in ['total distance', 'hml distance', 'sprint distance', 'max speed', 'sprints', 'average heart rate'] if m in gps_df.columns]
     st.session_state.selected_metrics = active_metrics[:3]
 
-phase_mapping = gps_df.groupby("Year-Week")["Training Phase"].first().to_dict()
+# --- 3. SYNC SESSION STATE ---
+if 'gps_active_weeks' not in st.session_state:
+    if not gps_df.empty and "Year-Week" in gps_df.columns:
+        all_gps = sorted(gps_df["Year-Week"].unique().tolist(), reverse=True)
+        st.session_state.gps_active_weeks = [all_gps[0]] if all_gps else []
+    else:
+        st.session_state.gps_active_weeks = []
 
+# --- SAFE PHASE MAPPING ---
+if not gps_df.empty and "Year-Week" in gps_df.columns and "Training Phase" in gps_df.columns:
+    phase_mapping = gps_df.groupby("Year-Week")["Training Phase"].first().to_dict()
+else:
+    phase_mapping = {}
 
 # ==========================================
 # --- 5. SIDEBAR NAVIGATION ---

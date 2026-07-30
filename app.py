@@ -534,15 +534,6 @@ def load_sc_data():
 
 
 
-# Guarantee clean formatting (removes hidden spaces and forces numbers)
-if "Entry Type" in raw_sc_df.columns:
-    raw_sc_df["Entry Type"] = raw_sc_df["Entry Type"].astype(str).str.strip()
-if "Test Name" in raw_sc_df.columns:
-    raw_sc_df["Test Name"] = raw_sc_df["Test Name"].astype(str).str.strip()
-if "1RM Predicted" in raw_sc_df.columns:
-    raw_sc_df["1RM Predicted"] = pd.to_numeric(raw_sc_df["1RM Predicted"], errors="coerce").fillna(0)
-if "max speed" in raw_gps_df.columns:
-    raw_gps_df["max speed"] = pd.to_numeric(raw_gps_df["max speed"], errors="coerce").fillna(0)
 
 header_styles = {
     "Back Squat": {"bg": "#FF0000", "text": "#FFFFFF"},

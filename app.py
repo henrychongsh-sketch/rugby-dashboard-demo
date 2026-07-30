@@ -1318,10 +1318,10 @@ elif dashboard_mode == "🎯 IDP Generator":
             standards_html += "</tr>"
 
             rows = [
-                ("Stage 1A", "#FF4B4B", ["90-99kg", "45-54kg", "2-4 Reps", "40-49 kg", "356-369s", "<27.0km/h"]),
-                ("Stage 1B", "#FFA500", ["100kg+", "55kg+", "5+ Reps", "50+ kg", "340-355s", "27.0-28.9km/h"]),
-                ("Stage 2", "#FFD700", ["1.70-1.89 x BW", "1.10-1.19 x BW", "1.30-1.39 x BW", "1.00-1.29 x BW", "320-339s", "29.0-30.9km/h"]),
-                ("Stage 3", "#32CD32", ["1.90+ x BW", "1.20+ x BW", "1.40+ x BW", "1.30+ x BW", "<320s", "≥ 31.0km/h"])
+                ("Stage 1A", "#FF4B4B", ["90-99kg", "45-54kg", "2-4 Reps", "40-49 kg", "345-360s", "<278.0km/h"]),
+                ("Stage 1B", "#FFA500", ["100kg+", "55kg+", "5+ Reps", "50+ kg", "320-344s", "28.0-29.9km/h"]),
+                ("Stage 2", "#FFD700", ["1.70-1.89 x BW", "1.10-1.19 x BW", "1.30-1.39 x BW", "1.00-1.29 x BW", "300-319s", "30.0-31.9km/h"]),
+                ("Stage 3", "#32CD32", ["1.90+ x BW", "1.20+ x BW", "1.40+ x BW", "1.30+ x BW", "<300s", "≥ 32.0km/h"])
             ]
 
             for stage_name, color_hex, values in rows:

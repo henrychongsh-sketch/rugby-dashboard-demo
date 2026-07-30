@@ -1377,26 +1377,29 @@ elif dashboard_mode == "🎯 IDP Generator":
                 # --- GYM KPIs ---
                 st.markdown("<h3 style='margin-top: -20px; margin-bottom: 10px; font-size: 1.5rem; font-weight: 600;'>🏋️ Gym KPIs</h3>", unsafe_allow_html=True)
 
-                # 1. Define all valid tests (Original + New)
+# 1. Define all valid tests (Original + New)
                 gym_tests = ["Back Squat", "Power Clean", "Bench Press", "Pull Up", "Bulgarian Split Squat", "Split Squat", "Belt Squat"]
                 extra_tests = ["Bulgarian Split Squat", "Split Squat", "Belt Squat"]
 
                 # GUARDRAIL: Only filter if the DataFrame actually has a 'Test Name' column
                 if not player_sc_df.empty and 'Test Name' in player_sc_df.columns:
-                # 2. Strict Filter: MUST be in the list AND must be an 'Entry Type' of 'Test'
-                gym_data = player_sc_df[
-                    (player_sc_df['Test Name'].isin(gym_tests)) &
-                    (player_sc_df['Entry Type'] == 'Test')
-                ].copy()
+                    # 2. Strict Filter: MUST be in the list AND must be an 'Entry Type' of 'Test'
+                    gym_data = player_sc_df[
+                        (player_sc_df['Test Name'].isin(gym_tests)) &
+                        (player_sc_df['Entry Type'] == 'Test')
+                    ].copy()
 
                 else:
-                # If there is no data, create an empty dataframe so the IDP generator doesn't break
-                filtered_gym = pd.DataFrame()
+                    # If there is no data, create an empty dataframe so the IDP generator doesn't break
+                    # CHANGED: Renamed from 'filtered_gym' to 'gym_data'
+                    gym_data = pd.DataFrame()
 
                 if gym_data.empty:
                     st.info(f"No Test-specific Gym KPI data available for {player}.")
                 else:
                     col_gym_tbl, col_gym_graph = st.columns([1.5, 1])
+                    
+                    # ... [rest of your code continues normally here] ...
 
                     with col_gym_tbl:
                         pivot_gym = gym_data.pivot_table(index='Test Name', columns='Year-Week', values='1RM Predicted', aggfunc='last')

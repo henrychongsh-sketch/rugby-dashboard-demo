@@ -476,22 +476,22 @@ GPS_FILE = os.path.join(DATA_DIR, "gps_master.csv")
 SC_FILE = os.path.join(DATA_DIR, "sc_testing_master.csv")
 
 @st.cache_data
-def load_gps_data():
-    if not os.path.exists(GPS_FILE):
+def load_gps_data(file_path):
+    if not os.path.exists(file_path):
         return pd.DataFrame()
     
     # header=0 tells pandas to use the first row as the header
-    df = pd.read_csv(GPS_FILE, header=0)
+    df = pd.read_csv(file_path, header=0)
     
     # Strip whitespace from column names to ensure "Year" is recognized
     df.columns = df.columns.str.strip()
     return df
 
 @st.cache_data
-def load_sc_data():
-    if not os.path.exists(SC_FILE):
+def load_sc_data(file_path):
+    if not os.path.exists(file_path):
         return pd.DataFrame()
-    df = pd.read_csv(SC_FILE)
+    df = pd.read_csv(file_path)
     df.columns = df.columns.str.strip()
 
     df["Test Name"] = df["Test Name"].replace("Bench Press (Swiss Bar)", "Bench Press")
@@ -513,8 +513,6 @@ def load_sc_data():
         week_str = df['Week'].astype(str).str.replace('.0', '', regex=False).str.zfill(2)
         df['Year-Week'] = year_str + "-W" + week_str
 
-    # --- MAKE SURE THERE IS NO 'return df' HERE! ---
-
     # BRZYCKI FORMULA CALCULATION
     def calculate_brzycki(row):
         load = row.get("Load (kg)", 0)
@@ -529,20 +527,18 @@ def load_sc_data():
     # Calculate Relative Strength
     df["Relative Strength"] = (df["1RM Predicted"] / df["Body Weight (kg)"].replace(0, 1)).round(2)
 
-    # --- ONLY ONE RETURN AT THE VERY END ---
     return df
 
 # --- UNIVERSAL GLOBAL DATA INGESTION ---
-# Load raw data globally so all pages can access it
-raw_gps_df = load_gps_data()
-raw_sc_df = load_sc_data()
+# Pass gps_path and sc_path here!
+raw_gps_df = load_gps_data(gps_path)
+raw_sc_df = load_sc_data(sc_path)
 
 # Apply Year-Week helper
 raw_gps_df = add_year_week(raw_gps_df)
 raw_sc_df = add_year_week(raw_sc_df)
 
-
-# Guarantee clean formatting (removes hidden spaces and forces numbers)
+# Guarantee clean formatting
 if "Entry Type" in raw_sc_df.columns:
     raw_sc_df["Entry Type"] = raw_sc_df["Entry Type"].astype(str).str.strip()
 if "Test Name" in raw_sc_df.columns:
@@ -551,6 +547,14 @@ if "1RM Predicted" in raw_sc_df.columns:
     raw_sc_df["1RM Predicted"] = pd.to_numeric(raw_sc_df["1RM Predicted"], errors="coerce").fillna(0)
 if "max speed" in raw_gps_df.columns:
     raw_gps_df["max speed"] = pd.to_numeric(raw_gps_df["max speed"], errors="coerce").fillna(0)
+
+# Load raw data globally (Pass gps_path and sc_path here too!)
+gps_df = load_gps_data(gps_path)
+sc_df = load_sc_data(sc_path)
+
+# Apply Year-Week helper ONCE
+gps_df = add_year_week(gps_df)
+sc_df = add_year_week(sc_df)
 
 
 header_styles = {
@@ -561,14 +565,6 @@ header_styles = {
     "Power Clean": {"bg": "#40E0D0", "text": "#FFFFFF"},
     "Max Speed": {"bg": "#87CEEB", "text": "#FFFFFF"}, # Dark Orange
 }
-
-# 1. Load raw data globally
-gps_df = load_gps_data()
-sc_df = load_sc_data()
-
-# 2. Apply Year-Week helper ONCE
-gps_df = add_year_week(gps_df)
-sc_df = add_year_week(sc_df)
 
 # ==========================================
 # 🏋️‍♂️ MASTER TEST NAME STANDARDIZATION (TOP OF SCRIPT)

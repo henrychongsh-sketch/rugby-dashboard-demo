@@ -490,7 +490,12 @@ def load_gps_data(file_path):
 @st.cache_data
 def load_sc_data(file_path):
     if not os.path.exists(file_path):
-        return pd.DataFrame()
+        # Return an empty DataFrame but with the exact columns your app expects
+        return pd.DataFrame(columns=[
+            "Test Name", "Player", "Date", "Week", "Body Weight (kg)", 
+            "Load (kg)", "Reps", "Year-Week", "1RM Predicted", "Relative Strength", "Entry Type"
+        ])
+        
     df = pd.read_csv(file_path)
     df.columns = df.columns.str.strip()
 

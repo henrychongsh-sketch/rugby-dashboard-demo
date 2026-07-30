@@ -532,14 +532,7 @@ def load_sc_data():
     # --- ONLY ONE RETURN AT THE VERY END ---
     return df
 
-# --- UNIVERSAL GLOBAL DATA INGESTION ---
-# Load raw data globally so all pages can access it
-raw_gps_df = load_gps_data()
-raw_sc_df = load_sc_data()
 
-# Apply Year-Week helper
-raw_gps_df = add_year_week(raw_gps_df)
-raw_sc_df = add_year_week(raw_sc_df)
 
 # Guarantee clean formatting (removes hidden spaces and forces numbers)
 if "Entry Type" in raw_sc_df.columns:

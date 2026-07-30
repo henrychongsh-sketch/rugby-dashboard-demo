@@ -619,7 +619,6 @@ if 'selected_metrics' not in st.session_state:
     active_metrics = [m for m in ['total distance', 'hml distance', 'sprint distance', 'max speed', 'sprints', 'average heart rate'] if m in gps_df.columns]
     st.session_state.selected_metrics = active_metrics[:3]
 
-phase_mapping = gps_df.groupby("Year-Week")["Training Phase"].first().to_dict()
 
 # ==========================================
 # --- 5. SIDEBAR NAVIGATION ---

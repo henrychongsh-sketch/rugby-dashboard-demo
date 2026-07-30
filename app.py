@@ -1688,34 +1688,34 @@ if not print_mode:
                     
                     st.dataframe(styler, use_container_width=True, hide_index=True)
 
-                # ==========================================
+# ==========================================
                 # BRANCH B: S&C DATA (Everything Else)
                 # ==========================================
                 else:
-# ADDED: Check if the column exists before processing
-                    if not lb_sc_df.empty and 'Test Name' in lb_sc_df.columns:
-                        
-                        # Catch "Test", "test", "Testing", etc.
+                    # 1. Guardrail: If missing data/columns, stop here and display info
+                    if lb_sc_df.empty or 'Test Name' not in lb_sc_df.columns:
+                        st.info("No data loaded")
+                    else:
+                        # 2. Catch "Test", "test", "Testing", etc.
                         if 'Entry Type' in lb_sc_df.columns:
                             is_test_mode = lb_sc_df['Entry Type'].astype(str).str.contains('test', case=False, na=False)
                         else:
                             is_test_mode = True
 
-                        # Force 1RM Predicted to be a numeric value, treating text/blanks as 0
+                        # 3. Force 1RM Predicted to be a numeric value
                         if '1RM Predicted' in lb_sc_df.columns:
                             numeric_1rm = pd.to_numeric(lb_sc_df['1RM Predicted'], errors='coerce').fillna(0)
                         else:
                             numeric_1rm = pd.Series(0, index=lb_sc_df.index)
 
+                        # 4. Filter data
                         at_data = lb_sc_df[
                             (lb_sc_df['Test Name'] == test_name) & 
                             is_test_mode & 
                             (numeric_1rm > 0)
                         ].copy()
-                    else:
-                        # FALLBACK: Create an empty DataFrame if the data is missing
-                        at_data = pd.DataFrame()
 
+                        # 5. Display Leaderboard or Error
                         if at_data.empty:
                             st.error(f"No >0 scores found for {test_name}.")
                         else:
@@ -1757,9 +1757,7 @@ if not print_mode:
                                 return [""] * len(df_d.columns)
 
                             styler = styler.apply(apply_all_time_coloring, axis=1)
-                            st.dataframe(styler, use_container_width=True, hide_index=True)  
-                    else:
-                        st.info("No data loaded")
+                            st.dataframe(styler, use_container_width=True, hide_index=True)
         
 
 # --- 🔄 FORCE REFRESH AT THE BOTTOM OF SIDEBAR ---

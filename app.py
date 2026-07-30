@@ -532,7 +532,25 @@ def load_sc_data():
     # --- ONLY ONE RETURN AT THE VERY END ---
     return df
 
+# --- UNIVERSAL GLOBAL DATA INGESTION ---
+# Load raw data globally so all pages can access it
+raw_gps_df = load_gps_data()
+raw_sc_df = load_sc_data()
 
+# Apply Year-Week helper
+raw_gps_df = add_year_week(raw_gps_df)
+raw_sc_df = add_year_week(raw_sc_df)
+
+
+# Guarantee clean formatting (removes hidden spaces and forces numbers)
+if "Entry Type" in raw_sc_df.columns:
+    raw_sc_df["Entry Type"] = raw_sc_df["Entry Type"].astype(str).str.strip()
+if "Test Name" in raw_sc_df.columns:
+    raw_sc_df["Test Name"] = raw_sc_df["Test Name"].astype(str).str.strip()
+if "1RM Predicted" in raw_sc_df.columns:
+    raw_sc_df["1RM Predicted"] = pd.to_numeric(raw_sc_df["1RM Predicted"], errors="coerce").fillna(0)
+if "max speed" in raw_gps_df.columns:
+    raw_gps_df["max speed"] = pd.to_numeric(raw_gps_df["max speed"], errors="coerce").fillna(0)
 
 
 header_styles = {

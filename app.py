@@ -1387,7 +1387,7 @@ elif dashboard_mode == "🎯 IDP Generator":
                 gym_data = player_sc_df[
                     (player_sc_df['Test Name'].isin(gym_tests)) &
                     (player_sc_df['Entry Type'] == 'Test')
-                ].copy() if not player_sc_df.empty else pd.DataFrame()
+                ].copy()
 
                 else:
                 # If there is no data, create an empty dataframe so the IDP generator doesn't break

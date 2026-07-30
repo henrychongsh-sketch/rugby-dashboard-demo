@@ -532,6 +532,9 @@ def load_sc_data():
     # --- ONLY ONE RETURN AT THE VERY END ---
     return df
 
+st.write("Columns available at line 622:", gps_df.columns.tolist())
+
+
 # --- UNIVERSAL GLOBAL DATA INGESTION ---
 # Load raw data globally so all pages can access it
 raw_gps_df = load_gps_data()
@@ -619,7 +622,6 @@ if 'selected_metrics' not in st.session_state:
     active_metrics = [m for m in ['total distance', 'hml distance', 'sprint distance', 'max speed', 'sprints', 'average heart rate'] if m in gps_df.columns]
     st.session_state.selected_metrics = active_metrics[:3]
 
-st.write("Columns available at line 622:", gps_df.columns.tolist())
 phase_mapping = gps_df.groupby("Year-Week")["Training Phase"].first().to_dict()
 
 

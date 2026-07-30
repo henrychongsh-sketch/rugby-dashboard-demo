@@ -532,9 +532,6 @@ def load_sc_data():
     # --- ONLY ONE RETURN AT THE VERY END ---
     return df
 
-st.write("Columns available at line 622:", gps_df.columns.tolist())
-
-
 # --- UNIVERSAL GLOBAL DATA INGESTION ---
 # Load raw data globally so all pages can access it
 raw_gps_df = load_gps_data()
@@ -563,19 +560,13 @@ header_styles = {
     "Max Speed": {"bg": "#87CEEB", "text": "#FFFFFF"}, # Dark Orange
 }
 
-# --- SILENT DATA INGESTION ---
-# 3. SILENT DATA INGESTION
+# 1. Load raw data globally
 gps_df = load_gps_data()
 sc_df = load_sc_data()
 
-# Now it knows what these functions are!
+# 2. Apply Year-Week helper ONCE
 gps_df = add_year_week(gps_df)
 sc_df = add_year_week(sc_df)
-
-
-# --- 2. LOAD AND PROCESS DATA (DO THIS ONCE) ---
-gps_df = add_year_week(load_gps_data())
-sc_df = add_year_week(load_sc_data())
 
 # ==========================================
 # 🏋️‍♂️ MASTER TEST NAME STANDARDIZATION (TOP OF SCRIPT)

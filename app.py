@@ -120,6 +120,10 @@ def update_week(state_key, week):
 
    # --- 1. DEFINE ALL FUNCTIONS FIRST ---
 def get_squad_rank_df(full_data, metric, test_col, t_col):
+# NEW GUARDRAIL: If the data is empty or missing required columns, stop here.
+    if full_data.empty or test_col not in full_data.columns or t_col not in full_data.columns:
+        return pd.DataFrame(columns=['Player', test_col, t_col, 'Rank_Str'])
+    
     d = full_data.copy()
     
     # Force the metric to be a numeric float (This prevents string-sorting bugs)
@@ -1377,11 +1381,17 @@ elif dashboard_mode == "🎯 IDP Generator":
                 gym_tests = ["Back Squat", "Power Clean", "Bench Press", "Pull Up", "Bulgarian Split Squat", "Split Squat", "Belt Squat"]
                 extra_tests = ["Bulgarian Split Squat", "Split Squat", "Belt Squat"]
 
+                # GUARDRAIL: Only filter if the DataFrame actually has a 'Test Name' column
+                if not player_sc_df.empty and 'Test Name' in player_sc_df.columns:
                 # 2. Strict Filter: MUST be in the list AND must be an 'Entry Type' of 'Test'
                 gym_data = player_sc_df[
                     (player_sc_df['Test Name'].isin(gym_tests)) &
                     (player_sc_df['Entry Type'] == 'Test')
                 ].copy() if not player_sc_df.empty else pd.DataFrame()
+
+                else:
+                # If there is no data, create an empty dataframe so the IDP generator doesn't break
+                filtered_gym = pd.DataFrame()
 
                 if gym_data.empty:
                     st.info(f"No Test-specific Gym KPI data available for {player}.")
@@ -1679,7 +1689,8 @@ if not print_mode:
                 # BRANCH B: S&C DATA (Everything Else)
                 # ==========================================
                 else:
-                    if not lb_sc_df.empty:
+# ADDED: Check if the column exists before processing
+                    if not lb_sc_df.empty and 'Test Name' in lb_sc_df.columns:
                         
                         # Catch "Test", "test", "Testing", etc.
                         if 'Entry Type' in lb_sc_df.columns:
@@ -1688,13 +1699,19 @@ if not print_mode:
                             is_test_mode = True
 
                         # Force 1RM Predicted to be a numeric value, treating text/blanks as 0
-                        numeric_1rm = pd.to_numeric(lb_sc_df['1RM Predicted'], errors='coerce').fillna(0)
+                        if '1RM Predicted' in lb_sc_df.columns:
+                            numeric_1rm = pd.to_numeric(lb_sc_df['1RM Predicted'], errors='coerce').fillna(0)
+                        else:
+                            numeric_1rm = pd.Series(0, index=lb_sc_df.index)
 
                         at_data = lb_sc_df[
                             (lb_sc_df['Test Name'] == test_name) & 
                             is_test_mode & 
                             (numeric_1rm > 0)
                         ].copy()
+                    else:
+                        # FALLBACK: Create an empty DataFrame if the data is missing
+                        at_data = pd.DataFrame()
 
                         if at_data.empty:
                             st.error(f"No >0 scores found for {test_name}.")

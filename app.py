@@ -1473,8 +1473,14 @@ elif dashboard_mode == "🎯 IDP Generator":
                 # --- FIELD KPIs ---
                 st.markdown("<h3 style='margin-top: -15px; margin-bottom: 10px; font-size: 1.5rem; font-weight: 600;'>🏃 Field KPIs</h3>", unsafe_allow_html=True)
 
-                bronco_df = player_sc_df[player_sc_df['Test Name'] == 'Bronco'].copy() if not player_sc_df.empty else pd.DataFrame()
-                if not bronco_df.empty:
+                # GUARDRAIL: Safely check for Bronco data
+                if not player_sc_df.empty and 'Test Name' in player_sc_df.columns:
+                    bronco_df = player_sc_df[player_sc_df['Test Name'] == 'Bronco'].copy()
+                else:
+                    bronco_df = pd.DataFrame()
+
+                # Safely assign the Score column if data exists
+                if not bronco_df.empty and '1RM Predicted' in bronco_df.columns:
                     bronco_df['Score'] = bronco_df['1RM Predicted']
 
                 speed_df = pd.DataFrame()
